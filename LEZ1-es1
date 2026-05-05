@@ -1,0 +1,27 @@
+# Esempio 1: Calcolare i quadrati dei numeri.
+quadrati_ciclo = []
+for i in range(5):
+    quadrati_ciclo.append(i**2)
+
+quadrati_comp = [i**2 for i in range(5)]
+print(quadrati_comp)
+
+
+# Esempio 2: Filtrare solo i numeri pari.
+pari_ciclo = []
+for i in range(10):
+    if i % 2 == 0:
+        pari_ciclo.append(i)
+
+pari_comp = [i for i in range(10) if i % 2 == 0]
+print(pari_comp)
+
+
+# Esempio 3: Trasformare le parole in maiuscolo.
+parole = ["ciao", "esame", "python"]
+maiuscole_ciclo = []
+for p in parole:
+    maiuscole_ciclo.append(p.upper())
+
+maiuscole_comp = [p.upper() for p in parole]
+print(maiuscole_comp)

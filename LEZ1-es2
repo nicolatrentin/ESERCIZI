@@ -1,0 +1,18 @@
+import numpy as np
+
+# Creo a mano l'array con i primi fino a 10.
+primi = np.array([2, 3, 5, 7])
+
+# Conto quanti elementi ci sono nei due modi richiesti.
+conteggio_len = len(primi)
+conteggio_size = primi.size
+print(conteggio_len)
+print(conteggio_size)
+
+# Mi aspetto un int64 o int32 dato che sono numeri interi piccoli. Verifico.
+print(primi.dtype)
+
+# Rifaccio la stessa cosa con una list comprehension che controlla i resti.
+primi_calcolati = [n for n in range(2, 11) if all(n % i != 0 for i in range(2, n))]
+array_primi = np.array(primi_calcolati)
+print(array_primi)
