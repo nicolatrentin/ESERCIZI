@@ -1,0 +1,39 @@
+import numpy as np
+
+# --- 1. Indicizzazione booleana ---
+primi = np.array([2, 3, 5, 7, 11, 13, 17, 19])
+
+# Seleziono i maggiori di 10
+maggiori_di_10 = primi > 10
+print("Test logico (> 10):", maggiori_di_10)
+
+# Seleziono i numeri primi pari
+primi_pari = primi % 2 == 0
+print("Numeri pari:", primi[primi_pari])
+
+
+# --- 2. Operazioni su array ---
+# Creo un array 2D 5x5
+a = np.arange(1, 26).reshape(5, 5)
+
+# b contiene 2a e 4a riga (indici 1 e 3)
+b = a[[1, 3], :]
+
+# c contiene la 3a riga (indice 2)
+c = a[2, :]
+
+# Divido ogni elemento di 'a' per 'c' (operazione per colonna gestita in automatico da NumPy)
+divisione = a / c
+print("\nMatrice divisa:\n", divisione)
+
+
+# --- 3. Seleziona il numero più vicino a 0.5 ---
+# Genero la matrice 10x3 con valori casuali [0, 1]
+matrice = np.random.rand(10, 3)
+
+# Calcolo l'indice del numero più vicino a 0.5 su ogni riga
+indici_vicini = np.abs(matrice - 0.5).argmin(axis=1)
+
+# Estrazione con fancy indexing (riga per riga)
+piu_vicini = matrice[np.arange(10), indici_vicini]
+print("\nPiù vicini a 0.5 per riga:\n", piu_vicini)

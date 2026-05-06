@@ -1,0 +1,48 @@
+import numpy as np 
+# --- 4. Analisi Frequenza Cardiaca ---
+battiti = np.array([68, 65, 77, 110, 160, 161, 162, 161, 160, 161, 162, 163, 164, 163, 162, 100, 90, 97, 72, 60, 70])
+
+print("\nFrequenza minima (riposo):", np.min(battiti))
+print("Frequenza massima (sforzo):", np.max(battiti))
+
+# Maschera booleana: True se battiti > 120
+sotto_sforzo = battiti > 120
+
+# Percentuale di tempo sotto sforzo
+percentuale = np.mean(sotto_sforzo) * 100
+print(f"Percentuale di tempo in esercizio: {percentuale:.2f}%")
+
+
+# --- 5. Manipolazione di vettori ---
+# Imposto dtype=float per permettere i decimali nei calcoli percentuali
+stipendi = np.array([50000, 105250, 55000, 89000], dtype=float)
+print("\nCosto totale iniziale:", np.sum(stipendi))
+
+# Aumento 15% al CEO
+stipendi[stipendi == 105250] *= 1.15
+# (Senza float, i decimali verrebbero troncati ad intero e il check successivo fallirebbe)
+
+# Aumento 20% stipendio minimo
+stipendi[stipendi == 50000] *= 1.20
+
+# Aumento 10% agli altri due (uso test logico escludendo i due già aumentati)
+altri = (stipendi != 121037.5) & (stipendi != 60000.0)
+stipendi[altri] *= 1.10
+
+print("Costo totale finale:", np.sum(stipendi))
+print("Costo reale dell'aumento al CEO:", 121037.50 - 105250)
+
+
+# --- 6. Valori di Co2 ---
+# (Simuliamo il caricamento tramite file)
+# dati_co2 = np.loadtxt('emissioni_co2.csv')
+dati_co2 = np.array([12.5, 19.1, 15.0, 22.4, 18.5, 17.9]) # Array di esempio
+
+# Valori sopra le 18 tonnellate
+sopra_18 = dati_co2[dati_co2 > 18]
+print("\nValori sopra soglia (>18):", len(sopra_18))
+print("Media dei valori sopra soglia:", np.mean(sopra_18))
+
+# Frazione sul totale
+frazione = np.sum(sopra_18) / np.sum(dati_co2)
+print("Frazione totale:", frazione)
