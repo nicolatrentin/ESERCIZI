@@ -1,0 +1,37 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df_alcol = pd.read_csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/alcohol-consumption/drinks.csv")
+
+# 1. Trovo i primi 10 paesi per consumo totale
+top_10 = df_alcol.sort_values(by='total_litres_of_pure_alcohol', ascending=False).head(10)
+print("Top 10 paesi (litri totali):\n", top_10[['country', 'total_litres_of_pure_alcohol']])
+
+# 2. Calcolo la media delle tre bevande
+print("\nMedia birre:", df_alcol['beer_servings'].mean())
+print("Media vino:", df_alcol['wine_servings'].mean())
+print("Media distillati:", df_alcol['spirit_servings'].mean())
+
+# 3. Creo la nuova colonna index
+df_alcol['alcohol_index'] = (df_alcol['beer_servings'] + df_alcol['wine_servings'] + df_alcol['spirit_servings']) / 3
+
+# 4. Trovo il paese con l'indice massimo usando idxmax()
+paese_max_idx = df_alcol.loc[df_alcol['alcohol_index'].idxmax(), 'country']
+print(f"\nPaese con alcohol_index più alto: {paese_max_idx}")
+
+# 5. Filtro i paesi con più di 100 birre
+paesi_100_birre = df_alcol[df_alcol['beer_servings'] > 100]
+
+# 6. Grafico a barre dei top 10 per consumo totale
+top_10.plot(kind='bar', x='country', y='total_litres_of_pure_alcohol', color='orange', legend=False)
+plt.title('Top 10 Paesi per consumo di alcol')
+plt.ylabel('Litri totali')
+plt.show()
+
+# 7. Line plot del vino ordinato per paese
+df_ordinato_paese = df_alcol.sort_values(by='country')
+df_ordinato_paese.plot(kind='line', x='country', y='wine_servings', figsize=(10,4), legend=False)
+plt.title('Consumo di vino per paese')
+plt.ylabel('Porzioni di vino')
+plt.xticks([]) # Tolgo i nomi dei paesi dall'asse x perché sono 190 e si sovrappongono tutti
+plt.show()

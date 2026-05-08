@@ -1,0 +1,22 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from datasets import load_dataset
+
+# Carico il dataset come impostato dalla prof
+dataset = load_dataset('lukebarousse/data_jobs')
+df_jobs = dataset['train'].to_pandas()
+df_jobs['job_posted_date'] = pd.to_datetime(df_jobs['job_posted_date'])
+
+# Raggruppo per paese e calcolo le statistiche richieste usando agg()
+stats_paese = df_jobs.groupby('job_country')['salary_year_avg'].agg(['mean', 'count', 'min', 'max'])
+print("Statistiche stipendi per paese (prime 5 righe):\n", stats_paese.head())
+
+# Calcolo lo stipendio medio per ruolo e lo ordino (dal più basso al più alto per il grafico orizzontale)
+stipendio_ruolo = df_jobs.groupby('job_title_short')['salary_year_avg'].mean().sort_values(ascending=True)
+
+# Grafico a barre orizzontali
+stipendio_ruolo.plot(kind='barh', figsize=(8, 6), color='skyblue')
+plt.title('Stipendio medio annuale per Ruolo')
+plt.xlabel('Stipendio Medio ($)')
+plt.ylabel('Ruolo (Job Title)')
+plt.show()

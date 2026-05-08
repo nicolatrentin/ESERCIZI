@@ -1,0 +1,27 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
+df_tips = pd.read_csv(url)
+
+# Raggruppo per giorno e calcolo media, conteggio, min e max
+stats_giorno = df_tips.groupby('day')['total_bill'].agg(['mean', 'count', 'min', 'max'])
+print("Statistiche del conto per giorno:\n", stats_giorno)
+
+# Creo la colonna conto per persona
+df_tips['conto_per_persona'] = df_tips['total_bill'] / df_tips['size']
+
+# Trovo il giorno con il conto medio più alto
+giorno_top = stats_giorno['mean'].idxmax()
+print(f"\nIl giorno con il conto medio più alto è: {giorno_top}")
+
+# Ordino la media dei conti dal più alto al più basso per il grafico
+conto_medio_ordinato = stats_giorno['mean'].sort_values(ascending=False)
+
+# Grafico a barre del conto medio
+conto_medio_ordinato.plot(kind='bar', color='lightgreen')
+plt.title('Conto medio per giorno della settimana')
+plt.xlabel('Giorno')
+plt.ylabel('Conto Medio ($)')
+plt.xticks(rotation=0) # Rende i nomi dei giorni orizzontali così si leggono meglio
+plt.show()
