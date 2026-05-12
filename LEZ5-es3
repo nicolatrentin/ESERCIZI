@@ -1,0 +1,28 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+df = pd.read_csv(url)
+
+# 1. Campioni per ogni specie
+print("Conteggio specie:\n", df['species'].value_counts())
+
+# 2. Media di lunghezza e larghezza petali per specie
+print("\nMedia petali:\n", df.groupby('species')[['petal_length', 'petal_width']].mean())
+
+# 3. Scatterplot: dimensioni dei petali
+plt.figure(figsize=(8, 5))
+sns.scatterplot(data=df, x='petal_length', y='petal_width', hue='species')
+plt.title("Dimensioni Petali")
+plt.show()
+
+# 4. Nuova colonna per l'area del petalo (approssimata a base x altezza)
+df['petal_area'] = df['petal_length'] * df['petal_width']
+print("\nStatistiche area:\n", df['petal_area'].describe())
+
+# 5. Boxplot dell'area per specie
+plt.figure(figsize=(8, 5))
+sns.boxplot(data=df, x='species', y='petal_area', palette='Set3')
+plt.title("Area del Petalo per Specie")
+plt.show()
