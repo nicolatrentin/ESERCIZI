@@ -1,0 +1,98 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 
+# SEZIONE 4 - Filtrare il DataFrame sales
+
+sales = pd.DataFrame(
+    data={
+        "employee": ["Katrina","Guanyu","Jan","Roman","Jacqueline","Paola","Esperanza","Alaina","Egweyn"],
+        "sales": [14, 17, 6, 12, 8, 3, 7, 15, 5],
+        "year": [2018, 2019, 2020, 2018, 2020, 2019, 2019, 2020, 2020],
+    }
+)
+
+# Vendite maggiori di 10
+print("--- Vendite > 10 ---")
+print(sales[sales["sales"] > 10])
+
+# Solo dati del 2018
+print("\n--- Anno 2018 ---")
+print(sales[sales["year"] == 2018])
+
+# Vendite > 13 E anno 2018
+print("\n--- Vendite > 13 e anno 2018 ---")
+print(sales[(sales["sales"] > 13) & (sales["year"] == 2018)])
+
+# TUTTO TRANNE vendite > 13 e anno 2018 (negazione con ~)
+print("\n--- Escludi vendite > 13 e anno 2018 ---")
+print(sales[~((sales["sales"] > 13) & (sales["year"] == 2018))])
+
+# Vendite / 3 > 3
+print("\n--- Vendite / 3 > 3 ---")
+print(sales[sales["sales"] / 3 > 3])
+
+# Dipendenti il cui nome è alfabeticamente dopo "J"
+print("\n--- Nomi dopo 'J' alfabeticamente ---")
+print(sales.query('employee > "J"'))
+
+
+# 
+# SEZIONE 5 - Analisi dataset videogiochi
+# 
+
+# Caricamento dataset
+url = "https://zenodo.org/record/5898311/files/vgsales.csv"
+df = pd.read_csv(url)
+
+# Quanti videogiochi sono stati pubblicati?
+print(f"\nNumero totale di videogiochi: {len(df)}")
+
+# --- Generi più popolari (bar plot) ---
+# Contiamo quanti giochi ci sono per ogni genere
+generi = df["Genre"].value_counts().reset_index()
+generi.columns = ["Genre", "count"]
+
+plt.figure(figsize=(10, 5))
+sns.barplot(data=generi, x="Genre", y="count", hue="Genre", legend=False, palette="viridis")
+plt.title("Generi più popolari")
+plt.xlabel("Genere")
+plt.ylabel("Numero di giochi")
+plt.xticks(rotation=45, ha="right")
+plt.tight_layout()
+plt.show()
+
+# --- Evoluzione del numero di giochi pubblicati nel tempo ---
+# Raggruppiamo per anno e contiamo i titoli
+giochi_per_anno = (
+    df.dropna(subset=["Year"])          # rimuoviamo righe senza anno
+      .groupby("Year")["Name"]
+      .count()
+      .reset_index(name="count")
+)
+
+plt.figure(figsize=(12, 5))
+sns.lineplot(data=giochi_per_anno, x="Year", y="count", marker="o")
+plt.title("Evoluzione dei giochi pubblicati nel tempo")
+plt.xlabel("Anno")
+plt.ylabel("Numero di giochi")
+plt.tight_layout()
+plt.show()
+
+# --- Vendite globali per genere e regione (stacked bar) ---
+# Sommiamo le vendite regionali per genere
+vendite_genere = (
+    df.groupby("Genre")[["NA_Sales", "EU_Sales", "JP_Sales", "Other_Sales"]]
+      .sum()
+      .sort_values("NA_Sales", ascending=False)
+)
+
+vendite_genere.plot(kind="bar", stacked=True, figsize=(12, 6), colormap="tab20")
+plt.title("Vendite globali per genere e regione")
+plt.xlabel("Genere")
+plt.ylabel("Vendite (milioni)")
+plt.xticks(rotation=45, ha="right")
+plt.legend(title="Regione", bbox_to_anchor=(1.01, 1), loc="upper left")
+plt.tight_layout()
+plt.show()
