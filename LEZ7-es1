@@ -1,0 +1,49 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import gamma
+
+# 1. Genera 1000 valori casuali da una distribuzione gamma con parametro di forma = 1
+forma_teorica = 1
+# 'rvs' sta per Random Variates Sample
+campione = gamma.rvs(a=forma_teorica, size=1000)
+
+# 2. Traccia l’istogramma del campione e sovrapponi la PDF
+plt.figure(figsize=(10, 5))
+# Istogramma (density=True normalizza l'area a 1 per poter sovrapporre la PDF)
+plt.hist(campione, bins=40, density=True, alpha=0.6, color='skyblue', label='Istogramma Dati')
+
+# PDF
+x = np.linspace(0, np.max(campione), 100)
+pdf_teorica = gamma.pdf(x, a=forma_teorica)
+plt.plot(x, pdf_teorica, 'r-', lw=2, label='PDF (Teorica)')
+
+plt.title("Distribuzione Gamma: Istogramma vs PDF")
+plt.xlabel("Valore")
+plt.ylabel("Densità")
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# 3. Stima il parametro di forma dal campione usando il metodo fit
+# Fissiamo loc=0 per avere una stima più precisa del parametro di forma e scala
+parametri_stimati = gamma.fit(campione, floc=0)
+forma_stimata = parametri_stimati[0]
+print(f"Parametro di forma teorico: {forma_teorica}")
+print(f"Parametro di forma stimato dal fit: {forma_stimata:.4f}")
+
+# 4. Traccia la funzione di distribuzione cumulativa (CDF)
+plt.figure(figsize=(10, 5))
+cdf_teorica = gamma.cdf(x, a=forma_teorica)
+plt.plot(x, cdf_teorica, 'g-', lw=2, label='CDF (Teorica)')
+plt.title("Funzione di Distribuzione Cumulativa (CDF)")
+plt.xlabel("Valore")
+plt.ylabel("Probabilità Cumulativa")
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# 5. Calcola la varianza
+varianza_campionaria = np.var(campione, ddof=1) # ddof=1 per lo stimatore non distorto
+varianza_teorica = gamma.var(a=forma_teorica)
+print(f"Varianza campionaria calcolata: {varianza_campionaria:.4f}")
+print(f"Varianza teorica: {varianza_teorica:.4f}")

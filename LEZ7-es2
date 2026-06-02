@@ -1,0 +1,47 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+# Dati
+temp_max = np.array([17, 19, 21, 28, 33, 38, 37, 37, 31, 23, 19, 18])
+temp_min = np.array([-62, -59, -56, -46, -32, -18, -9, -13, -25, -46, -52, -58])
+mesi = np.arange(12)
+
+# Definiamo un modello periodico (coseno) per le temperature annuali
+def modello_annuale(mese, media, ampiezza, offset_temporale):
+    # Usiamo 2*pi/12 per imporre un periodo di 12 mesi
+    return media + ampiezza * np.cos((mese + offset_temporale) * 2 * np.pi / 12)
+
+# Fitting dei dati (forniamo ipotesi iniziali stimate: [media, ampiezza, offset])
+popt_max, _ = curve_fit(modello_annuale, mesi, temp_max, p0=[25, 10, 0])
+popt_min, _ = curve_fit(modello_annuale, mesi, temp_min, p0=[-35, 25, 0])
+
+# Generiamo punti più densi per disegnare curve morbide
+mesi_continui = np.linspace(0, 11, 100)
+fit_max = modello_annuale(mesi_continui, *popt_max)
+fit_min = modello_annuale(mesi_continui, *popt_min)
+
+# Calcolo MAE e RMSE
+pred_max = modello_annuale(mesi, *popt_max)
+pred_min = modello_annuale(mesi, *popt_min)
+
+print("--- Metriche di Errore ---")
+print(f"Temp Max - MAE: {mean_absolute_error(temp_max, pred_max):.2f}, RMSE: {np.sqrt(mean_squared_error(temp_max, pred_max)):.2f}")
+print(f"Temp Min - MAE: {mean_absolute_error(temp_min, pred_min):.2f}, RMSE: {np.sqrt(mean_squared_error(temp_min, pred_min)):.2f}")
+
+# Plotting
+plt.figure(figsize=(10, 6))
+plt.plot(mesi, temp_max, 'ro', label="Temp Max (Dati)")
+plt.plot(mesi_continui, fit_max, 'r-', label="Fit Temp Max")
+
+plt.plot(mesi, temp_min, 'bo', label="Temp Min (Dati)")
+plt.plot(mesi_continui, fit_min, 'b-', label="Fit Temp Min")
+
+plt.xticks(mesi, ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'])
+plt.xlabel('Mesi')
+plt.ylabel('Temperatura')
+plt.title('Fitting delle Temperature Massime e Minime')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
