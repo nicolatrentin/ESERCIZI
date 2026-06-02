@@ -1,0 +1,81 @@
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
+import plotly.graph_objects as go
+from sklearn.metrics import root_mean_squared_error
+# Nota: train_test_split è importato, ma per un esercizio di puro fitting/approssimazione 
+# del trend storico complessivo si calcola l'RMSE sull'intero set di dati.
+from sklearn.model_selection import train_test_split 
+
+# 1. Caricamento del dataset
+# Se utilizzi il tuo file locale:
+# df = pd.read_csv('data.csv')
+
+# Alternativa con URL pubblico per un test immediato
+url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/airline-passengers.csv"
+df = pd.read_csv(url)
+df.columns = ['date', 'passengers']  # Uniformiamo i nomi delle colonne richiesti
+
+# 2. Conversione della data in formato numerico (mesi da gennaio 1949)
+df['date'] = pd.to_datetime(df['date'])
+
+# Gennaio 1949 diventerà il mese 1, febbraio 1949 il mese 2, ecc.
+df['mese_numerico'] = (df['date'].dt.year - 1949) * 12 + df['date'].dt.month
+
+# Prepariamo le variabili X (indipendente) e y (target/dipendente)
+X = df[['mese_numerico']]
+y = df['passengers']
+
+# 3. Applicazione della regressione polinomiale
+# Scegliamo un grado pari a 2 per descrivere la dolce curvatura del trend di crescita a lungo termine
+grado_polinomio = 2 
+
+# Creiamo una pipeline che unisce la generazione di feature polinomiali e il modello lineare
+modello_polinomiale = make_pipeline(PolynomialFeatures(degree=grado_polinomio), LinearRegression())
+modello_polinomiale.fit(X, y)
+
+# Calcoliamo i valori predetti dal modello sul campione
+y_pred = modello_polinomiale.predict(X)
+
+# 4. Calcolo dell'RMSE (Root Mean Squared Error)
+rmse = root_mean_squared_error(y, y_pred)
+print(f"--- Risultati del Modello ---")
+print(f"Grado del polinomio scelto: {grado_polinomio}")
+print(f"RMSE (Root Mean Squared Error): {rmse:.2f} passeggeri")
+
+# 5. Visualizzazione dei dati reali e della curva stimata con Plotly
+fig = go.Figure()
+
+# Grafico dei dati reali (punti uniti da una linea sottile per evidenziare la forte stagionalità)
+fig.add_trace(go.Scatter(
+    x=df['date'], 
+    y=y, 
+    mode='markers+lines', 
+    name='Dati Reali',
+    line=dict(color='blue', width=1),
+    marker=dict(size=4)
+))
+
+# Grafico della curva di regressione polinomiale (il trend di fondo stimato)
+fig.add_trace(go.Scatter(
+    x=df['date'], 
+    y=y_pred, 
+    mode='lines', 
+    name=f'Trend Polinomiale (Grado {grado_polinomio})',
+    line=dict(color='red', width=3)
+))
+
+# Configurazione del layout del grafico
+fig.update_layout(
+    title='Approssimazione del Traffico Aereo tramite Regressione Polinomiale',
+    xaxis_title='Data (Mese/Anno)',
+    yaxis_title='Numero di Passeggeri',
+    template='plotly_white',
+    legend=dict(x=0.01, y=0.99),
+    hovermode='x unified'
+)
+
+# Mostra il grafico interattivo nel browser o nel notebook
+fig.show()
